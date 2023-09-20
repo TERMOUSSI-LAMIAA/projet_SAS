@@ -22,9 +22,10 @@ int search_by_id(int id_rech){
 
     FILE *fich;
     fich=fopen("test.txt","r");
+    printf("%d;%s;%s",tache.id,tache.titre,tache.description);
     do{
         fscanf(fich,"%d;%99[^;];%99[^;]",&tache.id,tache.titre,tache.description);
-        printf("%d;%s;%s",tache.id,tache.titre,tache.description);
+
         if(tache.id==id_rech){
             fclose(fich);
             return 1;
@@ -58,6 +59,9 @@ void add_tache(Todo tache){
     fclose(fich);
 return;
 }
+void affichage_taches(Todo tache){
+
+}
 int main()
 {
     Todo tache;
@@ -86,6 +90,7 @@ int main()
             printf("2");
             goto menu;
         case 3:
+            affichage_taches(tache);
             menu_affichage:
             printf("1--Trier les taches par ordre alphabétique\n");
             printf("2--Trier les taches par deadline\n");
