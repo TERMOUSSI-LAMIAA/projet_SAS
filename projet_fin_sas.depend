@@ -1,0 +1,6 @@
+# depslib dependency file v1.0
+1695231021 source:c:\all\c_projects\projet_fin_sas\main.c
+	<stdio.h>
+	<stdlib.h>
+	<time.h>
+
