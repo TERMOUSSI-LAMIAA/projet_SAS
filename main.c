@@ -18,7 +18,7 @@ typedef struct {
 //fonction recherche par id
 int search_by_id(int id_rech){
     Todo tache;
-    char line[256];
+    char line[256]; //255
     FILE *fich;
     fich=fopen("test.txt","r");
     while(fgets(line,sizeof(line),fich)!= NULL){
@@ -59,7 +59,6 @@ void add_tache(Todo tache){
     fprintf(fich,"%d;%s;%s;%d/%d/%d\n",tache.id,tache.titre,tache.description,tache.deadline.day,
             tache.deadline.month,tache.deadline.year);
     fclose(fich);
-return;
 }
 void affichage_taches(Todo tache){
     FILE *fich;
@@ -73,36 +72,36 @@ void affichage_taches(Todo tache){
     }
     fclose(fich);
 }
-//void update_desc(Todo tache){
-//    FILE *fich,*F;
-//    char line[256];  //line[100]
-//    int id_updt;
-//    printf("Entrer l\'id de la tache a modifier");
-//    scanf("%d",&id_updt);
-//    fich=fopen("test.txt","r");
-//    F=fopen("temptest.txt","w");
-//    if (fich == NULL || F == NULL) {
-//        printf("Impossible d'ouvrir le fichier.\n");
-//        return; //return !
-//    }
-//    while(fgets(line,sizeof(line),fich)!= NULL){
-//        sscanf(line,"%d;%99[^;];%99[^;]",&tache.id,tache.titre,tache.description,
-//               &tache.deadline.day,&tache.deadline.month,&tache.deadline.year);
-//        if(tache.id==id_updt){
-////            tache.id=id_updt;
-//            printf("Entrer la nouvelle description:");
-//            scanf(" %99[^\n]",tache.description);
-//
-//        }
-//
-//        fprintf(F,"%d;%s;%s;%d/%d/%d\n",tache.id,tache.titre,tache.description,
-//                    tache.deadline.day,tache.deadline.month,tache.deadline.year);
-//    }
-//    fclose(fich);
-//    fclose(F);
-////    remove("test.txt");
-////    rename("temptest.txt", "test.txt");
-//}
+void update_desc(Todo tache){
+    FILE *fich,*F;
+    char line[256];  //line[100]
+    int id_updt;
+    printf("Entrer l\'id de la tache a modifier");
+    scanf("%d",&id_updt);
+    fich=fopen("test.txt","r");
+    F=fopen("temptest.txt","w");
+    if (fich == NULL || F == NULL) {
+        printf("Impossible d'ouvrir le fichier.\n");
+        return; //return !
+    }
+    while(fgets(line,sizeof(line),fich)!= NULL){
+        sscanf(line,"%d;%99[^;];%99[^;];%d/%d/%d",&tache.id,tache.titre,tache.description,
+               &tache.deadline.day,&tache.deadline.month,&tache.deadline.year);
+        if(tache.id==id_updt){
+//            tache.id=id_updt;
+            printf("Entrer la nouvelle description:");
+            scanf(" %99[^\n]",tache.description);
+
+        }
+
+        fprintf(F,"%d;%s;%s;%d/%d/%d\n",tache.id,tache.titre,tache.description,
+                    tache.deadline.day,tache.deadline.month,tache.deadline.year);
+    }
+    fclose(fich);
+    fclose(F);
+    remove("test.txt");
+    rename("temptest.txt", "test.txt");
+}
 void delete_tache(Todo tache){
     char line[256];
     FILE *fich,*F;
@@ -112,7 +111,7 @@ void delete_tache(Todo tache){
     printf("Entrer l\'id de la tache a supprimer");
     scanf("%d",&id_delete);
     while(fgets(line,sizeof(line),fich)!= NULL){
-        sscanf(line,"%d;%99[^;];%99[^;]",&tache.id,tache.titre,tache.description,
+        sscanf(line,"%d;%99[^;];%99[^;];%d/%d/%d",&tache.id,tache.titre,tache.description,
               &tache.deadline.day,&tache.deadline.month,&tache.deadline.year);
         if(tache.id!=id_delete){
             fprintf(F,"%d;%s;%s;%d/%d/%d\n",tache.id,tache.titre,tache.description,
@@ -121,12 +120,23 @@ void delete_tache(Todo tache){
     }
     fclose(fich);
     fclose(F);
+
+    if(remove("test.txt") != 0){
+        //ERROR
+        printf("Error connot delete the recoder");
+        return;
+    }
+    if(rename("temptest.txt", "test.txt")!=0){
+        //ERROR
+        printf("Error connot delete the recoder");
+        return;
+    }
     printf("Supression effectue avec succes\n");
 }
 void rech_affichage_id(Todo tache){
     FILE *fich;
     int id_srch,cpt=0;
-    char line[100];
+    char line[256];
     fich=fopen("test.txt","r");
     printf("Entrer l\id de la tache recherche: ");
     scanf("%d",&id_srch);
@@ -240,7 +250,7 @@ int main()
             scanf("%d",&ch_modif);
             switch(ch_modif){
                 case 1:
-//                    update_desc(tache);
+                    update_desc(tache);
                     goto menu_modification;
                 case 2:
                     printf("4/2");
