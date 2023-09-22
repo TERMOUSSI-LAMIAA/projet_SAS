@@ -1,10 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
 #include <string.h>
-enum Statut_tache{
-    A_REALISER=1,EN_COURS_DE_REALISATION=2,FINALISEE=3//1.2.3 pour lentree d'utilisateur
-};
+//enum Statut_tache{
+//    A_REALISER=1,EN_COURS_DE_REALISATION=2,FINALISEE=3//1.2.3 pour lentree d'utilisateur
+//};
 typedef struct{
     int day,month,year;
 }Date;
@@ -13,7 +12,7 @@ typedef struct {
     char titre[100];
     char description[100];
     Date deadline;//day/month/year +(time)//struct date-->date deadline
-//    enum Statut_tache statut;//retourne int +switch pour afficher "a realiser"
+    char statut[100];//retourne int +switch pour afficher "a realiser"
 }Todo;
 //fonction recherche par id
 int search_by_id(int id_rech){
@@ -22,8 +21,8 @@ int search_by_id(int id_rech){
     FILE *fich;
     fich=fopen("test.txt","r");
     while(fgets(line,sizeof(line),fich)!= NULL){
-        sscanf(line,"%d;%99[^;];%99[^;]",&tache.id,tache.titre,tache.description,&tache.deadline.day,
-               &tache.deadline.month,&tache.deadline.year);
+        sscanf(line,"%d;%99[^;];%99[^;];%d/%d/%d;%99[^;]",&tache.id,tache.titre,tache.description,&tache.deadline.day,
+               &tache.deadline.month,&tache.deadline.year,tache.statut);
         if(tache.id==id_rech){
 
             fclose(fich);
@@ -35,7 +34,7 @@ int search_by_id(int id_rech){
 }
 void add_tache(Todo tache){
     FILE *fich;
-
+    int stat;
         top:
     printf("\nEntrez id de la tache:");
     scanf("%d",&tache.id);
@@ -49,15 +48,35 @@ void add_tache(Todo tache){
     }
     printf("\nEntrezle titre :");
     scanf(" %99[^\n]",tache.titre);
-//    getchar();
-//    fgets(tache.titre,sizeof(tache.titre),stdin);
     printf("\nEntrez la description:");
     scanf(" %99[^\n]",tache.description);
     printf("\nEntrez deadline:");
     scanf("%d/%d/%d",&tache.deadline.day,&tache.deadline.month,&tache.deadline.year);
-//    fgets(tache.description,sizeof(tache.description),stdin);
-    fprintf(fich,"%d;%s;%s;%d/%d/%d\n",tache.id,tache.titre,tache.description,tache.deadline.day,
-            tache.deadline.month,tache.deadline.year);
+    printf("Entrez le statut de la tache.\n");
+    printf("1--A REALISER\n");
+    printf("2--EN COURS DE REALISATION\n");
+    printf("3--FINALISEE\n");
+    printf("\nEntrez le statut:");
+    scanf("%d",&stat);
+    //menu de statut
+    switch(stat){
+         case 1:
+            strcpy(tache.statut,"A REALISE");
+            break;
+        case 2:
+            strcpy(tache.statut,"EN COURS DE REALISATION");
+            break;
+        case 3:
+            strcpy(tache.statut,"FINALISEE");
+            break;
+        default:
+            printf("Statut inconnu");
+            break;
+    }
+
+
+    fprintf(fich,"%d;%s;%s;%d/%d/%d;%s\n",tache.id,tache.titre,tache.description,tache.deadline.day,
+            tache.deadline.month,tache.deadline.year,tache.statut);
     fclose(fich);
 }
 void affichage_taches(Todo tache){
@@ -72,67 +91,121 @@ void affichage_taches(Todo tache){
     }
     fclose(fich);
 }
-void update_desc(Todo tache){
-    FILE *fich,*F;
-    char line[256];  //line[100]
-    int id_updt;
-    printf("Entrer l\'id de la tache a modifier");
-    scanf("%d",&id_updt);
-    fich=fopen("test.txt","r");
-    F=fopen("temptest.txt","w");
-    if (fich == NULL || F == NULL) {
-        printf("Impossible d'ouvrir le fichier.\n");
-        return; //return !
-    }
-    while(fgets(line,sizeof(line),fich)!= NULL){
-        sscanf(line,"%d;%99[^;];%99[^;];%d/%d/%d",&tache.id,tache.titre,tache.description,
-               &tache.deadline.day,&tache.deadline.month,&tache.deadline.year);
-        if(tache.id==id_updt){
-//            tache.id=id_updt;
-            printf("Entrer la nouvelle description:");
-            scanf(" %99[^\n]",tache.description);
-
-        }
-
-        fprintf(F,"%d;%s;%s;%d/%d/%d\n",tache.id,tache.titre,tache.description,
-                    tache.deadline.day,tache.deadline.month,tache.deadline.year);
-    }
-    fclose(fich);
-    fclose(F);
-    remove("test.txt");
-    rename("temptest.txt", "test.txt");
-}
-void delete_tache(Todo tache){
-    char line[256];
-    FILE *fich,*F;
-    fich=fopen("test.txt","r");
-    F=fopen("temptest.txt","a");
-    int id_delete;
-    printf("Entrer l\'id de la tache a supprimer");
-    scanf("%d",&id_delete);
-    while(fgets(line,sizeof(line),fich)!= NULL){
-        sscanf(line,"%d;%99[^;];%99[^;];%d/%d/%d",&tache.id,tache.titre,tache.description,
-              &tache.deadline.day,&tache.deadline.month,&tache.deadline.year);
-        if(tache.id!=id_delete){
-            fprintf(F,"%d;%s;%s;%d/%d/%d\n",tache.id,tache.titre,tache.description,
-                   tache.deadline.day,tache.deadline.month,tache.deadline.year);
-        }
-    }
-    fclose(fich);
-    fclose(F);
-
-    if(remove("test.txt") != 0){
-        //ERROR
-        printf("Error connot delete the recoder");
-        return;
-    }
-    if(rename("temptest.txt", "test.txt")!=0){
-        //ERROR
-        printf("Error connot delete the recoder");
-        return;
-    }
-    printf("Supression effectue avec succes\n");
-}
+//void update_desc(Todo tache){
+//    int id_updt;
+//    printf("Entrer l\'id de la tache a modifier");
+//    scanf("%d",&id_updt);
+//    if(search_by_id(id_updt)==-1){
+//         printf("id introuvable\n");
+//         return;
+//    }
+//    FILE *fich,*F;
+//    char line[256];
+//    fich=fopen("test.txt","r");
+//    F=fopen("temptest.txt","w");
+//    if (fich == NULL || F == NULL) {
+//        printf("Impossible d'ouvrir le fichier.\n");
+//        return; //return !
+//    }
+//    while(fgets(line,sizeof(line),fich)!= NULL){
+//        sscanf(line,"%d;%99[^;];%99[^;];%d/%d/%d;%99[^;]",&tache.id,tache.titre,tache.description,
+//               &tache.deadline.day,&tache.deadline.month,&tache.deadline.year,tache.statut);
+//        if(tache.id==id_updt){
+//            printf("Entrer la nouvelle description:");
+//            scanf(" %99[^\n]",tache.description);
+//        }
+//        fprintf(F,"%d;%s;%s;%d/%d/%d;%s\n",tache.id,tache.titre,tache.description,
+//                    tache.deadline.day,tache.deadline.month,tache.deadline.year,tache.statut);
+//    }
+//
+//    fclose(fich);
+//    fclose(F);
+//    remove("test.txt");
+//    rename("temptest.txt", "test.txt");
+//    if(remove("test.txt") != 0){
+//        printf("Erreur de modification\n");
+//        return;
+//    }
+//    if(rename("temptest.txt", "test.txt")!=0){
+//        printf("Erreur de modification\n");
+//        return;
+//    }
+//    printf("Modification effectue avec succes\n");
+//
+//}
+//void update_stat(Todo tache){
+//    FILE *fich,*F;
+//    char line[256];
+//    int id_updt;
+//    printf("Entrer l\'id de la tache a modifier");
+//    scanf("%d",&id_updt);
+//    fich=fopen("test.txt","r");
+//    F=fopen("temptest.txt","w");
+//    if (fich == NULL || F == NULL) {
+//        printf("Impossible d'ouvrir le fichier.\n");
+//        return; //return pour sortir
+//    }
+//    while(fgets(line,sizeof(line),fich)!= NULL){
+//        sscanf(line,"%d;%99[^;];%99[^;];%d/%d/%d;%99[^;]",&tache.id,tache.titre,tache.description,
+//               &tache.deadline.day,&tache.deadline.month,&tache.deadline.year,tache.statut);
+//        if(tache.id==id_updt){
+//            printf("Entrer le nouveau statut:");
+//            scanf(" %99[^\n]",tache.statut);
+//        }
+//
+//        fprintf(F,"%d;%s;%s;%d/%d/%d;%s\n",tache.id,tache.titre,tache.description,
+//                    tache.deadline.day,tache.deadline.month,tache.deadline.year,tache.statut);
+//    }
+//    fclose(fich);
+//    fclose(F);
+//    remove("test.txt");
+//    rename("temptest.txt", "test.txt");
+//    if(remove("test.txt") != 0){
+//        printf("Erreur de suppression");
+//        return;
+//    }
+//    if(rename("temptest.txt", "test.txt")!=0){
+//        printf("Erreur de suppression");
+//        return;
+//    }
+//    printf("Modification effectue avec succes\n");
+//}
+//void delete_tache(Todo tache){
+//    int id_delete;
+//    printf("Entrer l\'id de la tache a supprimer");
+//    scanf("%d",&id_delete);
+//    if(search_by_id(id_delete)==-1){
+//         printf("id introuvable\n");
+//         return;
+//    }
+//    char line[256];
+//    FILE *fich,*F;
+//    fich=fopen("test.txt","r");
+//    F=fopen("temptest.txt","a");
+//
+//
+//    while(fgets(line,sizeof(line),fich)!= NULL){
+//        sscanf(line,"%d;%99[^;];%99[^;];%d/%d/%d;%99[^;]",&tache.id,tache.titre,tache.description,
+//            &tache.deadline.day,&tache.deadline.month,&tache.deadline.year,tache.statut);
+//        if(tache.id!=id_delete){
+//            fprintf(F,"%d;%s;%s;%d/%d/%d;%s\n",tache.id,tache.titre,tache.description,
+//                tache.deadline.day,tache.deadline.month,tache.deadline.year,tache.statut);
+//        }
+//    }
+//
+//    fclose(fich);
+//    fclose(F);
+//
+//    if(remove("test.txt") != 0){
+//        printf("Erreur de suppression");
+//        return;
+//    }
+//    if(rename("temptest.txt", "test.txt")!=0){
+//        printf("Erreur de suppression");
+//        return;
+//    }
+//    printf("Supression effectue avec succes\n");
+//}
 void rech_affichage_id(Todo tache){
     FILE *fich;
     int id_srch,cpt=0;
@@ -144,8 +217,8 @@ void rech_affichage_id(Todo tache){
         printf("Erreur lors de l'ouverture du fichier");
     }
     while(fgets(line,sizeof(line),fich)!= NULL){
-        sscanf(line,"%d;%99[^;];%99[^;]",&tache.id,tache.titre,tache.description,&tache.deadline.day,
-               &tache.deadline.month,&tache.deadline.year);
+        sscanf(line,"%d;%99[^;];%99[^;];%d/%d/%d;%99[^;]",&tache.id,tache.titre,tache.description,&tache.deadline.day,
+               &tache.deadline.month,&tache.deadline.year,tache.statut);
         if(tache.id==id_srch){
             printf("%s",line);
             cpt=1;//id existe
@@ -168,8 +241,8 @@ void rech_affichage_titre(Todo tache){
         printf("Erreur lors de l'ouverture du fichier");
     }
     while(fgets(line,sizeof(line),fich)!= NULL){
-        sscanf(line,"%d;%99[^;];%99[^;]",&tache.id,tache.titre,tache.description,&tache.deadline.day,
-               &tache.deadline.month,&tache.deadline.year);
+        sscanf(line,"%d;%99[^;];%99[^;];%d/%d/%d;%99[^;]",&tache.id,tache.titre,tache.description,&tache.deadline.day,
+               &tache.deadline.month,&tache.deadline.year,tache.statut);
         if(strcmp(tache.titre, tit_srch)==0){
             printf("%s",line);
             cpt=1;//id existe
@@ -179,6 +252,95 @@ void rech_affichage_titre(Todo tache){
         printf("titre non existant\n");
     }
     fclose(fich);
+}
+void tri_alpha(Todo tache){
+    FILE *fich;
+    char line[100];
+    fich=fopen("test.txt","r");
+    if (fich == NULL) {
+        printf("Erreur lors de l'ouverture du fichier");
+        return 1;
+    }
+    char titles[100][100];
+    int nbr_tit = 0;
+    while(fgets(line,sizeof(line),fich)!=NULL){
+         sscanf(line,"%d;%99[^;];%99[^;];%d/%d/%d;%99[^;]",&tache.id,tache.titre,tache.description,&tache.deadline.day,
+               &tache.deadline.month,&tache.deadline.year,tache.statut);
+        strcpy(titles[nbr_tit],tache.titre);
+        nbr_tit++;
+    }
+    for (int i = 0; i < nbr_tit-1 ; i++){   //nbr_tit-1
+        for (int j = i + 1; j < nbr_tit; j++){
+            if (strcmp(titles[i], titles[j]) > 0){
+                char temp[100];
+                strcpy(temp, titles[i]);
+                strcpy(titles[i], titles[j]);
+                strcpy(titles[j], temp);
+            }
+        }
+    }
+    printf("Tâches triées par ordre alphabétique :\n");
+    for (int i = 0; i < nbr_tit; i++) {
+        printf("%s\n", titles[i]);
+    }
+    fclose(fich);
+}
+int compare_dates(const Todo a, const Todo b) {
+    if (a.deadline.year != b.deadline.year)
+        return a.deadline.year - b.deadline.year;
+    if (a.deadline.month != b.deadline.month)
+        return a.deadline.month - b.deadline.month;
+    return a.deadline.day - b.deadline.day;
+}
+void tri_deadline(Todo tache){
+    FILE *fich;
+    char line[100];
+    int cpt=0;
+    Todo temp;
+    Todo taches[100];
+    fich=fopen("test.txt","r");
+    if (fich == NULL) {
+        printf("Erreur lors de l'ouverture du fichier");
+        return 1;
+    }
+    while(fgets(line,sizeof(line),fich)!=NULL){
+         sscanf(line,"%d;%99[^;];%99[^;];%d/%d/%d;%99[^;]",&tache.id,tache.titre,tache.description,&tache.deadline.day,
+               &tache.deadline.month,&tache.deadline.year,tache.statut);
+         cpt++;
+    }
+    fclose(fich);
+//    while(fgets(line,sizeof(line),fich)!=NULL){
+//         sscanf(line,"%d;%99[^;];%99[^;];%d/%d/%d;%99[^;]",&tache.id,tache.titre,tache.description,&tache.deadline.day,
+//               &tache.deadline.month,&tache.deadline.year,tache.statut);
+//        for(int i=0;i<cpt-1;i++){//cpt-1
+//            for(int j=i+1;j<cpt;j++)
+//                if((tache[i].deadline.year>tache[j].deadline.year) || \
+//                (tache[i].deadline.year==tache[j].deadline.year  && tache[i].deadline.month>tache[j].deadline.month) ||\
+//                (tache[i].deadline.year==tache[j].deadline.year  &&\
+//                 tache[i].deadline.month==tache[j].deadline.month && tache[i].deadline.day>tache[j].deadline.day)){
+//                    temp=tache[i];
+//                    tache[i]=tache[j];
+//                    tache[j]=temp;
+//                 }
+//            }
+//            printf("%s",line);
+    for (int i = 0; i < cpt - 1; i++) {
+        for (int j = i + 1; j < cpt; j++) {
+            if (compare_dates(tache[i], tache[j]) > 0) {
+                // Échanger les tâches
+                Todo temp = tache[i];
+                tache[i] = tache[j];
+                tache[j] = temp;
+            }
+        }
+    }
+    for (int i = 0; i < cpt; i++) {
+        printf("%d;%s;%s;%d/%d/%d;%s\n", tache[i].id, tache[i].titre, tac[i].description,
+               tache[i].deadline.day, tache[i].deadline.month, tache[i].deadline.year,
+               tache[i].statut);
+    }
+        }
+
 }
 int main()
 {
@@ -229,10 +391,10 @@ int main()
             scanf("%d",&ch_afchg);
             switch(ch_afchg){
                 case 1:
-                    printf("3/1");
+                    tri_alpha(tache);
                     goto menu_affichage;
                 case 2:
-                    printf("3/2");
+                    tri_deadline(tache);
                     goto menu_affichage;
                 case 3:
                     printf("3/3");
@@ -250,10 +412,10 @@ int main()
             scanf("%d",&ch_modif);
             switch(ch_modif){
                 case 1:
-                    update_desc(tache);
+//                    update_desc(tache);
                     goto menu_modification;
                 case 2:
-                    printf("4/2");
+//                    update_stat(tache);
                     goto menu_modification;
                 case 3:
                     printf("4/3");
@@ -264,7 +426,7 @@ int main()
             }
             goto menu;
         case 5:
-            delete_tache(tache);
+//            delete_tache(tache);
             goto menu;
         case 6:
             menu_recherche:

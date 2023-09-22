@@ -1,8 +1,7 @@
 # depslib dependency file v1.0
-1695316551 source:c:\all\c_projects\projet_fin_sas\main.c
+1695392761 source:c:\all\c_projects\projet_fin_sas\main.c
 	<stdio.h>
 	<stdlib.h>
-	<time.h>
 	<string.h>
 
 1695328404 source:c:\all\c projects\sas\main.c
