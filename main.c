@@ -87,6 +87,8 @@ top:
     fprintf(fich, "%d;%s;%s;%d/%d/%d;%s\n", tache.id, tache.titre, tache.description, tache.deadline.day,
             tache.deadline.month, tache.deadline.year, tache.statut);
     fclose(fich);
+    printf("Ajout avec succes\n");
+    nbr_tot_taches();
 }
 void affichage_taches()
 {
@@ -222,6 +224,53 @@ void update_stat()
     }
     printf("Modification effectue avec succes\n");
 }
+void update_deadline(){
+    Todo tache;
+    FILE *fich, *F;
+    int id_updt;
+    char line[256];
+    printf("Entrer l\'id de deadline a modifier:\n\t");
+    scanf("%d", &id_updt);
+    if (search_by_id(id_updt) == -1)
+    {
+        printf("id introuvable\n");
+        return;
+    }
+    fich = fopen("test.txt", "r");
+    F = fopen("temptest.txt", "w");
+    if (fich == NULL || F == NULL)
+    {
+        printf("Impossible d'ouvrir le fichier.\n");
+        return; // return pour sortir
+    }
+     while (fgets(line, sizeof(line), fich) != NULL)
+    {
+        sscanf(line, "%d;%99[^;];%99[^;];%d/%d/%d;%99[^\n]", &tache.id, tache.titre, tache.description,
+               &tache.deadline.day, &tache.deadline.month, &tache.deadline.year, tache.statut);
+        if (tache.id == id_updt)
+        {
+            printf("Entrer le nouveau deadline:");
+            scanf("%d/%d/%d",&tache.deadline.day, &tache.deadline.month, &tache.deadline.year);
+        }
+        fprintf(F, "%d;%s;%s;%d/%d/%d;%s\n", tache.id, tache.titre, tache.description,
+                tache.deadline.day, tache.deadline.month, tache.deadline.year, tache.statut);
+    }
+
+    fclose(fich);
+    fclose(F);
+    if (remove("test.txt") != 0)
+    {
+        printf("Erreur de modification");
+        return;
+    }
+    if (rename("temptest.txt", "test.txt") != 0)
+    {
+        printf("Erreur de modification");
+        return;
+    }
+    printf("Modification effectue avec succes\n");
+
+}
  void delete_tache(){
      Todo tache;
      int id_delete;
@@ -255,6 +304,7 @@ void update_stat()
          return;
      }
      printf("Supression effectue avec succes\n");
+     nbr_tot_taches();
  }
 void rech_affichage_id()
 {
@@ -367,7 +417,6 @@ void tri_alpha()
      *todo1 = *todo2;
      *todo2 = tmp;
  }
-
   void tri_deadline(){
      FILE *fich;
      char line[100];
@@ -402,6 +451,46 @@ void tri_alpha()
                 taches[i].statut);
      }
  }
+ int nbr_tot_taches(){//appelle dans les autre fonctions
+     FILE *fich;
+     char line[100];
+     int cpt=0;
+     fich=fopen("test.txt","r");
+     if (fich == NULL) {
+         printf("Erreur lors de l'ouverture du fichier");
+         return 1;
+     }
+     while(fgets(line,sizeof(line),fich)!=NULL){
+        cpt++;
+     }
+    fclose(fich);
+    return cpt;
+ }
+ void nbr_tach_com_incomp(){
+     Todo tache;
+     FILE *fich;
+     char line[100];
+     int cpt_comp=0,cpt_incomp=0;
+     fich=fopen("test.txt","r");
+     if (fich == NULL) {
+         printf("Erreur lors de l'ouverture du fichier");
+         return 1;
+     }
+     while(fgets(line,sizeof(line),fich)!=NULL){
+            sscanf(line, "%d;%99[^;];%99[^;];%d/%d/%d;%99[^;]", &tache.id, tache.titre, tache.description, &tache.deadline.day,
+            &tache.deadline.month, &tache.deadline.year, tache.statut);
+            if((strcmp(tache.statut,"A REALISER")==0) || (strcmp(tache.statut,"EN COURS DE REALISATION")==0)){
+                cpt_comp++;
+            }
+            else if(strcmp(tache.statut,"FINALISEE")==0){
+                cpt_incomp++;
+            }
+    }
+    printf("le nombre de tâches complète :%d\n",cpt_comp);
+    printf("le nombre de tâches incompletes :%d\n",cpt_incomp);
+    fclose(fich);
+ }
+
 int main()
 {
     int choix, ch_afchg, ch_modif, ch_rech, ch_statq;
@@ -425,7 +514,6 @@ menu:
         break;
     case 1:
         add_tache();
-        printf("Ajout avec succes\n");
         goto menu;
     case 2:
         add_tache();
@@ -483,7 +571,7 @@ menu:
             update_stat();
             goto menu_modification;
         case 3:
-            printf("4/3");
+            update_deadline();
             goto menu_modification;
         default:
             printf("Entrer un choix valide\n");
@@ -520,10 +608,10 @@ menu:
         switch (ch_statq)
         {
         case 1:
-            printf("7/1");
+            printf("Nombre total de tache : %d\n",nbr_tot_taches());
             goto menu_statistiques;
         case 2:
-            printf("7/2");
+            nbr_tach_com_incomp();
             goto menu_statistiques;
         case 3:
             printf("7/3");
