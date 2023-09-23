@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 // enum Statut_tache{
 //     A_REALISER=1,EN_COURS_DE_REALISATION=2,FINALISEE=3//1.2.3 pour lentree d'utilisateur
 // };
@@ -477,19 +478,87 @@ void tri_alpha()
          return 1;
      }
      while(fgets(line,sizeof(line),fich)!=NULL){
-            sscanf(line, "%d;%99[^;];%99[^;];%d/%d/%d;%99[^;]", &tache.id, tache.titre, tache.description, &tache.deadline.day,
+            sscanf(line, "%d;%99[^;];%99[^;];%d/%d/%d;%99[^\n]", &tache.id, tache.titre, tache.description, &tache.deadline.day,
             &tache.deadline.month, &tache.deadline.year, tache.statut);
-            if((strcmp(tache.statut,"A REALISER")==0) || (strcmp(tache.statut,"EN COURS DE REALISATION")==0)){
+//            if((strcmp(tache.statut,"A REALISER")==0) || (strcmp(tache.statut,"EN COURS DE REALISATION")==0)){
+//                cpt_comp++;
+//            }
+             if(strcmp(tache.statut,"FINALISEE")==0){
                 cpt_comp++;
-            }
-            else if(strcmp(tache.statut,"FINALISEE")==0){
-                cpt_incomp++;
+
+            }else{
+                  cpt_incomp++;
             }
     }
+    fclose(fich);
     printf("le nombre de tâches complète :%d\n",cpt_comp);
     printf("le nombre de tâches incompletes :%d\n",cpt_incomp);
-    fclose(fich);
+
  }
+
+int isDateWithin3Days(Date givenDate){
+// get current date
+time_t currentTime;
+struct tm *timeInfo;
+time(&currentTime);
+// Add one to avoid count today
+currentTime = currentTime + ( 24 * 3600);
+
+time_t threeDaysFromNow = currentTime + (3 * 24 * 3600);
+struct tm *cu_date;
+cu_date = localtime(&currentTime);
+
+// cast Date to tm
+struct tm date_tm = {0};
+date_tm.tm_year = givenDate.year - 1900;
+date_tm.tm_mon = givenDate.month -1;
+date_tm.tm_mday = givenDate.day;
+date_tm.tm_hour = cu_date->tm_hour;
+date_tm.tm_min = cu_date->tm_min;
+date_tm.tm_sec = cu_date->tm_sec;
+time_t toCheck = mktime(&date_tm);
+
+
+/*
+
+printf("\t t = %d/%d/%d\n",cu_date->tm_mday,cu_date->tm_mon,cu_date->tm_year+1900);
+
+printf("\t c = %d/%d/%d\n",date_tm.tm_mday,date_tm.tm_mon,date_tm.tm_year+1900);
+
+struct tm *date_3;
+date_3 = localtime(&threeDaysFromNow);
+printf("\t 3_t = %d/%d/%d\n\n",date_3->tm_mday,date_3->tm_mon,date_3->tm_year+1900);
+
+printf("%d",toCheck < threeDaysFromNow  && toCheck > currentTime);
+
+printf("\t%lld\n",currentTime);
+printf("\t%lld\n",toCheck);
+printf("\t%lld\n",threeDaysFromNow);*/
+// return true if the given date is in 3days intrval from now
+return toCheck <= threeDaysFromNow && toCheck >= currentTime;
+}
+
+
+void showTachesWithIn3Days(){
+     Todo tache;
+     FILE *fich;
+     char line[100];
+     fich=fopen("test.txt","r");
+     if (fich == NULL) {
+         printf("Erreur lors de l'ouverture du fichier");
+         return 1;
+     }
+     printf("Taches with in 3 dayes :\n");
+     while(fgets(line,sizeof(line),fich)!=NULL){
+            sscanf(line, "%d;%99[^;];%99[^;];%d/%d/%d;%99[^\n]", &tache.id, tache.titre, tache.description, &tache.deadline.day,
+            &tache.deadline.month, &tache.deadline.year, tache.statut);
+             if(isDateWithin3Days(tache.deadline)){
+               printf("\t%s",line);
+            }
+
+    }
+    fclose(fich);
+}
 
 int main()
 {
@@ -548,7 +617,7 @@ menu:
             tri_deadline();
             goto menu_affichage;
         case 3:
-            printf("3/3");
+            showTachesWithIn3Days();
             goto menu_affichage;
         default:
             printf("Entrer un choix valide\n");
