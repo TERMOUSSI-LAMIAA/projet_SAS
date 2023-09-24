@@ -56,7 +56,7 @@ top:
     {
         printf("Impossible d'ouvrir le fichier.\n");
     }
-    printf("\nEntrezle titre :");
+    printf("\nEntrez le titre :");
     scanf(" %99[^\n]", tache.titre);
     printf("\nEntrez la description:");
     scanf(" %99[^\n]", tache.description);
@@ -110,7 +110,7 @@ void update_desc()
 {
     Todo tache;
     int id_updt;
-    printf("Entrer l\'id de la tache a modifier");
+    printf("Entrer l\'id de la tache a modifier : ");
     scanf("%d", &id_updt);
     if (search_by_id(id_updt) == -1)
     {
@@ -132,7 +132,7 @@ void update_desc()
                &tache.deadline.day, &tache.deadline.month, &tache.deadline.year, tache.statut);
         if (tache.id == id_updt)
         {
-            printf("Entrer la nouvelle description:");
+            printf("Entrer la nouvelle description : ");
             scanf(" %99[^\n]", tache.description);
         }
         fprintf(F, "%d;%s;%s;%d/%d/%d;%s\n", tache.id, tache.titre, tache.description,
@@ -159,7 +159,7 @@ void update_stat()
     FILE *fich, *F;
     char line[256];
     int id_updt, stat;
-    printf("Entrer l\'id de la tache a modifier:\n\t");
+    printf("Entrer l\'id de la tache a modifier: ");
     scanf("%d", &id_updt);
     if (search_by_id(id_updt) == -1)
     {
@@ -196,7 +196,7 @@ void update_stat()
             switch (stat)
             {
             case 1:
-                strcpy(tache.statut, "A REALISER");
+                (tache.statut, "A REALISER");
                 break;
             case 2:
                 strcpy(tache.statut, "EN COURS DE REALISATION");
@@ -230,7 +230,7 @@ void update_deadline(){
     FILE *fich, *F;
     int id_updt;
     char line[256];
-    printf("Entrer l\'id de deadline a modifier:\n\t");
+    printf("Entrer l\'id de deadline a modifier: ");
     scanf("%d", &id_updt);
     if (search_by_id(id_updt) == -1)
     {
@@ -275,7 +275,7 @@ void update_deadline(){
  void delete_tache(){
      Todo tache;
      int id_delete;
-     printf("Entrer l\'id de la tache a supprimer");
+     printf("Entrer l\'id de la tache a supprimer: ");
      scanf("%d",&id_delete);
      if(search_by_id(id_delete)==-1){
           printf("id introuvable\n");
@@ -366,9 +366,9 @@ void rech_affichage_titre()
     }
     fclose(fich);
 }
-void tri_alpha()
+void tri_alpha()///////!!!!!!!!!!
 {
-    Todo tache;
+    Todo taches [100];
     FILE *fich;
     char line[100];
     fich = fopen("test.txt", "r");
@@ -377,42 +377,44 @@ void tri_alpha()
         printf("Erreur lors de l'ouverture du fichier");
         return 1;
     }
-    char titles[100][100];
-    int nbr_tit = 0;
+//    char titles[100][100];
+    int cpt = 0;
     while (fgets(line, sizeof(line), fich) != NULL)
     {
-        sscanf(line, "%d;%99[^;];%99[^;];%d/%d/%d;%99[^;]", &tache.id, tache.titre, tache.description, &tache.deadline.day,
-               &tache.deadline.month, &tache.deadline.year, tache.statut);
-        strcpy(titles[nbr_tit], tache.titre);
-        nbr_tit++;
+         sscanf(line,"%d;%99[^;];%99[^;];%d/%d/%d;%99[^\n]",&taches[cpt].id,taches[cpt].titre,taches[cpt].description,\
+         &taches[cpt].deadline.day,&taches[cpt].deadline.month,&taches[cpt].deadline.year,taches[cpt].statut);
+          cpt++;
+//         strcpy(titles[nbr_tit], tache.titre);
     }
-    for (int i = 0; i < nbr_tit - 1; i++)
-    { // nbr_tit-1
-        for (int j = i + 1; j < nbr_tit; j++)
+    for (int i = 0; i < cpt - 1; i++)
+    {
+        for (int j = 0; j < cpt-1; j++)
         {
-            if (strcmp(titles[i], titles[j]) > 0)
+            if (strcmp(taches[i].titre,taches[j].titre) > 0)
             {
-                char temp[100];
-                strcpy(temp, titles[i]);
-                strcpy(titles[i], titles[j]);
-                strcpy(titles[j], temp);
+                Todo temp;
+                temp= taches[i];
+                taches[i], taches[j];
+                taches[j], temp;
             }
         }
     }
-    printf("Tâches triées par ordre alphabétique :\n");
-    for (int i = 0; i < nbr_tit; i++)
+    printf("Taches triees par ordre alphabetique :\n");
+    for (int i = 0; i < cpt; i++)
     {
-        printf("%s\n", titles[i]);
+        printf("%d;%s;%s;%d/%d/%d;%s\n", taches[i].id, taches[i].titre, taches[i].description,
+        taches[i].deadline.day, taches[i].deadline.month, taches[i].deadline.year,taches[i].statut);
     }
     fclose(fich);
 }
- int compare_dates(const Todo a, const Todo b) {
-     if (a.deadline.year != b.deadline.year)
-         return a.deadline.year - b.deadline.year;
-     if (a.deadline.month != b.deadline.month)
-         return a.deadline.month - b.deadline.month;
-     return a.deadline.day - b.deadline.day;
- }
+// int compare_dates(const Todo a, const Todo b) {
+//     if (a.deadline.year != b.deadline.year)
+//         return a.deadline.year - b.deadline.year;
+//     if (a.deadline.month != b.deadline.month)
+//         return a.deadline.month - b.deadline.month;
+//     return a.deadline.day - b.deadline.day;
+// }
+ //tri deadline
  void swap(Todo *todo1,Todo *todo2){
      Todo tmp = *todo1;
      *todo1 = *todo2;
@@ -437,7 +439,7 @@ void tri_alpha()
      fclose(fich);
 
     for(int i=0;i<cpt-1;i++){//cpt-1
-             for(int j=0;j<cpt -i -1;j++)
+             for(int j=0;j<cpt -1-i;j++)//cpt-1-i
                  if((taches[j].deadline.year>taches[j +1].deadline.year) || \
                 (taches[j].deadline.year==taches[j +1].deadline.year  && taches[j].deadline.month>taches[j +1].deadline.month) ||\
                 (taches[j].deadline.year==taches[j +1].deadline.year  &&\
@@ -452,7 +454,7 @@ void tri_alpha()
                 taches[i].statut);
      }
  }
- int nbr_tot_taches(){//appelle dans les autre fonctions
+ int nbr_tot_taches(){
      FILE *fich;
      char line[100];
      int cpt=0;
@@ -480,9 +482,6 @@ void tri_alpha()
      while(fgets(line,sizeof(line),fich)!=NULL){
             sscanf(line, "%d;%99[^;];%99[^;];%d/%d/%d;%99[^\n]", &tache.id, tache.titre, tache.description, &tache.deadline.day,
             &tache.deadline.month, &tache.deadline.year, tache.statut);
-//            if((strcmp(tache.statut,"A REALISER")==0) || (strcmp(tache.statut,"EN COURS DE REALISATION")==0)){
-//                cpt_comp++;
-//            }
              if(strcmp(tache.statut,"FINALISEE")==0){
                 cpt_comp++;
 
@@ -491,8 +490,8 @@ void tri_alpha()
             }
     }
     fclose(fich);
-    printf("le nombre de tâches complète :%d\n",cpt_comp);
-    printf("le nombre de tâches incompletes :%d\n",cpt_incomp);
+    printf("le nombre de taches complete :%d\n",cpt_comp);
+    printf("le nombre de taches incompletes :%d\n",cpt_incomp);
 
  }
 
@@ -559,7 +558,29 @@ void showTachesWithIn3Days(){
     }
     fclose(fich);
 }
+void deadline_3days(){
+    time_t current_time = time(NULL); //La fonction time(NULL) renvoie le nombre de secondes écoulées depuis le 1er janvier
 
+                    printf("les tâches dont le deadline est dans 3 jours ou moins:\n");
+                    for (int i = 0; i < numTasks; i++) {
+                        struct tm taskDeadline = {0};
+                        taskDeadline.tm_year = tasks[i].year - 1900;
+                        taskDeadline.tm_mon = tasks[i].month - 1;// La raison de la soustraction de 1 provient du fait que la structure\
+                                                                    tm de la bibliothèque <time.h> utilise des mois allant de 0 à 11
+                        taskDeadline.tm_mday = tasks[i].day;
+                        time_t taskTime = mktime(&taskDeadline);
+
+                        // Calculate the difference in seconds
+                        int differenceInSeconds = difftime(taskTime, currentTime);
+
+                        // Check if the difference is within 3 days (3 days * 24 hours * 3600 seconds)
+                        if (differenceInSeconds <= 3 * 24 * 3600) {
+                            printf("Task ID: %d || Title: %s || Description: %s || Deadline: %d-%02d-%02d || Status: %s\n\n",
+                                tasks[i].id, tasks[i].title, tasks[i].description,
+                                tasks[i].year, tasks[i].month, tasks[i].day, tasks[i].status);
+                        }
+                    }
+}
 int main()
 {
     int choix, ch_afchg, ch_modif, ch_rech, ch_statq;
@@ -581,6 +602,8 @@ menu:
     {
     case 0:
         break;
+//        exit(0);
+
     case 1:
         add_tache();
         goto menu;
@@ -604,20 +627,21 @@ menu:
     case 3:
         affichage_taches();
     menu_affichage:
-        printf("1--Trier les taches par ordre alphabétique\n");
-        printf("2--Trier les taches par deadline\n");
-        printf("3--Afficher les taches dont le deadline est dans 3 jours ou moins\n");
+        printf("\t1--Trier les taches par ordre alphabetique\n");
+        printf("\t2--Trier les taches par deadline\n");
+        printf("\t3--Afficher les taches dont le deadline est dans 3 jours ou moins\n");
+        printf("\tEntrer votre choix:");
         scanf("%d", &ch_afchg);
         switch (ch_afchg)
         {
         case 1:
             tri_alpha();
-            goto menu_affichage;
+            goto menu;
         case 2:
             tri_deadline();
             goto menu_affichage;
         case 3:
-            showTachesWithIn3Days();
+//            showTachesWithIn3Days();
             goto menu_affichage;
         default:
             printf("Entrer un choix valide\n");
@@ -627,42 +651,43 @@ menu:
     case 4:
     menu_modification:
         printf("\t1--Modifier la description d\'une tache\n");
-        printf("\t2--Modifier le statut d\’une tache\n");
-        printf("\t3--Modifier le deadline d\’une tache\n");
-        printf("\tEntrer votre choix:\n\t");
+        printf("\t2--Modifier le statut d\'une tache\n");
+        printf("\t3--Modifier le deadline d\'une tache\n");
+        printf("\tEntrer votre choix: ");
         scanf("%d", &ch_modif);
         switch (ch_modif)
         {
         case 1:
             update_desc();
-            goto menu_modification;
+            goto menu;
         case 2:
             update_stat();
-            goto menu_modification;
+            goto menu;
         case 3:
             update_deadline();
-            goto menu_modification;
+            goto menu;
         default:
             printf("Entrer un choix valide\n");
             goto menu_modification;
         }
-        goto menu;
+//        goto menu;
     case 5:
-                    delete_tache();
+            delete_tache();
         goto menu;
     case 6:
     menu_recherche:
-        printf("1--Rechercher une tâche par son Identifiant\n");
-        printf("2--Rechercher une tâche par son Titre\n");
+        printf("\t1--Rechercher une tache par son Identifiant\n");
+        printf("\t2--Rechercher une tache par son Titre\n");
+        printf("\tEntrer votre choix: ");
         scanf("%d", &ch_rech);
         switch (ch_rech)
         {
         case 1:
             rech_affichage_id();
-            goto menu_recherche;
+            goto menu;
         case 2:
             rech_affichage_titre();
-            goto menu_recherche;
+            goto menu;
         default:
             printf("Entrer un choix valide\n");
             goto menu_recherche;
@@ -670,26 +695,27 @@ menu:
         goto menu;
     case 7:
     menu_statistiques:
-        printf("1--Afficher le nombre total des taches\n");
-        printf("2--Afficher le nombre de taches complètes et incompletes\n");
-        printf("3--Afficher le nombre de jours restants jusqu'au délai de chaque tache\n");
+        printf("\t1--Afficher le nombre total des taches\n");
+        printf("\t2--Afficher le nombre de taches completes et incompletes\n");
+        printf("\t3--Afficher le nombre de jours restants jusqu'au delai de chaque tache\n");
+        printf("\tEntrer votre choix: ");
         scanf("%d", &ch_statq);
         switch (ch_statq)
         {
         case 1:
             printf("Nombre total de tache : %d\n",nbr_tot_taches());
-            goto menu_statistiques;
-        case 2:
+            goto menu;
+        case 2 :
             nbr_tach_com_incomp();
-            goto menu_statistiques;
+            goto menu;
         case 3:
-            printf("7/3");
-            goto menu_statistiques;
+            deadline_3days();
+            goto menu;
         default:
             printf("Entrer un choix valide\n");
             goto menu_statistiques;
         }
-        goto menu;
+//        goto menu;!!
     default:
         printf("Entrer un choix valide\n");
         goto menu;
